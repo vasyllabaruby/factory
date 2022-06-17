@@ -1,0 +1,30 @@
+version: 2.1
+
+executors:
+  default:
+    docker:
+      - image: cimg/ruby:3.1.2
+
+commands:
+  defaults:
+    steps:
+      - checkout
+      - run: bundle install
+  run_specs:
+    steps:
+      - run:
+          name: run specs
+          command: rspec
+
+jobs:
+  run_specs:
+    executor: default
+    steps:
+      - defaults
+      - run_specs
+
+workflows:
+  build:
+    jobs:
+      - run_specs:
+
