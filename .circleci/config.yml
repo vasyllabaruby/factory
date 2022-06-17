@@ -26,5 +26,5 @@ jobs:
 workflows:
   build:
     jobs:
-      - run_specs:
+      - run_specs
 
