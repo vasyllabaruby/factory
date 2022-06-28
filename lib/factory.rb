@@ -18,104 +18,95 @@
 class Factory
 
   def self.new(class_name, *args, &block)
-
     if class_name.is_a? String
-      my_class = Class.new do
-        attr_accessor(*args)
-
-        define_method :initialize do |*attr|
-          raise ArgumentError, "Too many arguments" if args.size > attr.size
-          attr.each_with_index do |attr, index|
-            instance_variable_set("@#{args[index]}", attr)
-          end
-        end
-
-        class_eval(&block) if block_given?
-      end
+      my_class = create_new_class(*args, &block)
       const_set(class_name, my_class)
-      #p send(class_name)
     else
-      Class.new do
-        attr_accessor(*args.unshift(class_name))
+      create_new_class(class_name, *args, &block)
+    end
+  end
 
-        def initialize(*attr)
-          raise ArgumentError if vars.size < attr.size
-          attr.each_with_index do |attr, index|
-            instance_variable_set("@#{vars[index]}", attr)
-          end
+  def self.create_new_class(*args, &block)
+    Class.new do
+      attr_accessor(*args) #attr_accessor(*args.unshift(class_name))
+
+      define_method :initialize do |*attr|
+        raise ArgumentError if args.size < attr.size
+        attr.each_with_index do |attr, index|
+          instance_variable_set("@#{args[index]}", attr)
         end
-
-        define_method :vars do
-          args
-        end
-
-        def ==(expected)
-          vars.each { |arg| return false if self.public_send(arg) != expected.public_send(arg) }
-          true
-        end
-
-        def [](var)
-          if var.is_a?(Integer)
-            instance_variable_get(instance_variables[var])
-          else
-            instance_variable_get("@#{var}")
-          end
-        end
-
-        def []=(key, value)
-          instance_variable_set("@#{key}", value)
-        end
-
-        def dig(*args)
-          to_h.dig(*args)
-        end
-
-        def to_h
-          hash = {}
-          members.each {|var| hash[var] = instance_variable_get("@#{var}").to_h }
-          p hash # => {"name"=>"book", "price"=>15.95}
-        end
-
-        def each(&block)
-          to_a.each(&block)
-        end
-
-        def each_pair(&block)
-          hash = Hash.new { |h, k| h[k] = '' }
-          to_a.each_with_index do |elem, index|
-            hash[vars[index]] << elem.to_s
-          end
-          hash.each_pair(&block)
-        end
-
-        def length
-          members.length
-        end
-
-        def size
-          members.size
-        end
-
-        def members
-          vars
-        end
-
-        def select(&block)
-          to_a.select(&block)
-        end
-
-        def to_a
-          members.map { |member| instance_variable_get("@#{member}") }
-        end
-
-        def values_at(*arg)
-          result = Array.new
-          to_a.each_with_index { |el, index| result.push(el) if arg.include?(index) }
-          result
-        end
-
-        class_eval(&block) if block_given?
       end
+
+      define_method :vars do
+        args
+      end
+
+      def ==(expected)
+        vars.each { |arg| return false if self.public_send(arg) != expected.public_send(arg) }
+        true
+      end
+
+      def [](var)
+        if var.is_a?(Integer)
+          instance_variable_get(instance_variables[var])
+        else
+          instance_variable_get("@#{var}")
+        end
+      end
+
+      def []=(key, value)
+        instance_variable_set("@#{key}", value)
+      end
+
+      def dig(*args)
+        to_h.dig(*args)
+      end
+
+      def to_h
+        hash = {}
+        members.map { |member| [member, self[member]] }.to_h
+      end
+
+      def each(&block)
+        to_a.each(&block)
+      end
+
+      def each_pair(&block)
+        hash = Hash.new { |h, k| h[k] = '' }
+        to_a.each_with_index do |elem, index|
+          hash[vars[index]] << elem.to_s
+        end
+        hash.each_pair(&block)
+      end
+
+      def length
+        members.length
+      end
+
+      def size
+        members.size
+      end
+
+      def members
+        vars
+      end
+
+      def select(&block)
+        to_a.select(&block)
+      end
+
+      def to_a
+        members.map { |member| instance_variable_get("@#{member}") }
+      end
+
+      def values_at(*arg)
+        result = Array.new
+        to_a.each_with_index { |el, index| result.push(el) if arg.include?(index) }
+        result
+      end
+
+      class_eval(&block) if block_given?
     end
   end
 end
+
