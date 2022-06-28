@@ -1,0 +1,11 @@
+AllCops:
+  Exclude:
+    - 'spec/factory_spec.rb'
+Metrics/MethodLength:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Enabled: false

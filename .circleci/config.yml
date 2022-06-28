@@ -1,0 +1,46 @@
+version: 2.1
+
+executors:
+  default:
+    docker:
+      - image: cimg/ruby:3.1.2
+
+commands:
+  defaults:
+    steps:
+      - checkout
+      - run: bundle install
+  run_specs:
+    steps:
+      - run:
+          name: run specs
+          command: rspec
+  run_linters:
+    steps:
+      - run:
+          name: rubocop
+          command: rubocop
+      - run:
+          name: fasterer
+          command: fasterer
+
+jobs:
+  linters:
+    executor: default
+    steps:
+      - defaults
+      - run_linters
+  run_specs:
+    executor: default
+    steps:
+      - defaults
+      - run_specs
+
+workflows:
+  build:
+    jobs:
+      - linters
+      - run_specs:
+          requires:
+            - linters
+
