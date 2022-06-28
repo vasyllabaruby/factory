@@ -15,8 +15,21 @@ commands:
       - run:
           name: run specs
           command: rspec
+  run_linters:
+    steps:
+      - run:
+          name: rubocop
+          command: rubocop
+      - run:
+          name: fasterer
+          command: fasterer
 
 jobs:
+  linters:
+    executor: default
+    steps:
+      - defaults
+      - run_linters
   run_specs:
     executor: default
     steps:
@@ -26,5 +39,8 @@ jobs:
 workflows:
   build:
     jobs:
-      - run_specs
+      - linters
+      - run_specs:
+          requires:
+            - linters
 
