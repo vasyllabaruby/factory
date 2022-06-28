@@ -63,34 +63,37 @@ class Factory
         end
 
         def []=(key, value)
-            instance_variable_set("@#{key}", value)
+          instance_variable_set("@#{key}", value)
         end
 
         def dig(*args)
-          # instance_variables.map { |val| instance_variable_get(val) }.dig(*argsgit )
-          self.dig(*args)
+          to_h.dig(*args)
+        end
+
+        def to_h
+          hash = {}
+          members.each {|var| hash[var] = instance_variable_get("@#{var}").to_h }
+          p hash # => {"name"=>"book", "price"=>15.95}
         end
 
         def each(&block)
-          instance_variables.map { |val| instance_variable_get(val) }.each(&block)
+          to_a.each(&block)
         end
 
         def each_pair(&block)
           hash = Hash.new { |h, k| h[k] = '' }
-
-          instance_variables.map { |val| instance_variable_get(val) }.each_with_index do |elem, index|
+          to_a.each_with_index do |elem, index|
             hash[vars[index]] << elem.to_s
           end
-
           hash.each_pair(&block)
         end
 
         def length
-          instance_variables.length
+          members.length
         end
 
         def size
-          instance_variables.size
+          members.size
         end
 
         def members
@@ -98,11 +101,11 @@ class Factory
         end
 
         def select(&block)
-          instance_variables.map { |val| instance_variable_get(val) }.select(&block)
+          to_a.select(&block)
         end
 
         def to_a
-          instance_variables.map { |val| instance_variable_get(val) }
+          members.map { |member| instance_variable_get("@#{member}") }
         end
 
         def values_at(*arg)
