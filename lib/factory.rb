@@ -38,12 +38,12 @@ class Factory
         end
       end
 
-      define_method :vars do
+      define_method :members do
         args
       end
 
       def ==(other)
-        vars.each { |arg| return false if public_send(arg) != other.public_send(arg) }
+        members.each { |arg| return false if public_send(arg) != other.public_send(arg) }
         true
       end
 
@@ -75,7 +75,7 @@ class Factory
         hash = {}
         arr = to_a
         arr.length.times do |index|
-          hash[vars[index]] = arr[index].to_s
+          hash[members[index]] = arr[index].to_s
         end
         hash.each_pair(&block)
       end
@@ -86,10 +86,6 @@ class Factory
 
       def size
         members.size
-      end
-
-      def members
-        vars
       end
 
       def select(&block)
