@@ -96,7 +96,7 @@ class Factory
       end
 
       def to_a
-        members.map { |member| instance_variable_get("@#{member}") }
+        members.map { |member| self[member] }
       end
 
       def values_at(*arg)
