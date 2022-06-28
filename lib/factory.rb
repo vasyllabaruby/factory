@@ -16,7 +16,6 @@
 # - ==, eql?
 
 class Factory
-
   def self.new(class_name, *args, &block)
     if class_name.is_a? String
       my_class = create_new_class(*args, &block)
@@ -28,12 +27,13 @@ class Factory
 
   def self.create_new_class(*args, &block)
     Class.new do
-      attr_accessor(*args) #attr_accessor(*args.unshift(class_name))
+      attr_accessor(*args)
 
       define_method :initialize do |*attr|
         raise ArgumentError if args.size < attr.size
-        attr.each_with_index do |attr, index|
-          instance_variable_set("@#{args[index]}", attr)
+
+        attr.length.times do |index|
+          instance_variable_set("@#{args[index]}", attr[index])
         end
       end
 
@@ -41,8 +41,8 @@ class Factory
         args
       end
 
-      def ==(expected)
-        vars.each { |arg| return false if self.public_send(arg) != expected.public_send(arg) }
+      def ==(other)
+        vars.each { |arg| return false if public_send(arg) != other.public_send(arg) }
         true
       end
 
@@ -63,7 +63,6 @@ class Factory
       end
 
       def to_h
-        hash = {}
         members.map { |member| [member, self[member]] }.to_h
       end
 
@@ -73,8 +72,9 @@ class Factory
 
       def each_pair(&block)
         hash = Hash.new { |h, k| h[k] = '' }
-        to_a.each_with_index do |elem, index|
-          hash[vars[index]] << elem.to_s
+        arr = to_a
+        arr.length.times do |index|
+          hash[vars[index]] << arr[index].to_s
         end
         hash.each_pair(&block)
       end
@@ -100,8 +100,9 @@ class Factory
       end
 
       def values_at(*arg)
-        result = Array.new
-        to_a.each_with_index { |el, index| result.push(el) if arg.include?(index) }
+        result = []
+        arr = to_a
+        arr.length.times { |index| result.push(arr[index]) if arg.include?(index) }
         result
       end
 
@@ -109,4 +110,3 @@ class Factory
     end
   end
 end
-
