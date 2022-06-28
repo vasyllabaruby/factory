@@ -14,7 +14,6 @@
 # - to_a
 # - values_at
 # - ==, eql?
-
 class Factory
   def self.new(class_name, *args, &block)
     if class_name.is_a? String

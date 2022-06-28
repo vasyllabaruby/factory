@@ -1,8 +1,6 @@
 AllCops:
   Exclude:
     - 'spec/factory_spec.rb'
-Style/Documentation:
-  Enabled: false
 Style/FrozenStringLiteralComment:
   Enabled: false
 Metrics/MethodLength:
