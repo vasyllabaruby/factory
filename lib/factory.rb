@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # * Here you must define your `Factory` class.
 # * Each instance of Factory could be stored into variable. The name of this variable is the name of created Class
 # * Arguments of creatable Factory instance are fields/attributes of created class
@@ -70,10 +72,10 @@ class Factory
       end
 
       def each_pair(&block)
-        hash = Hash.new { |h, k| h[k] = '' }
+        hash = {}
         arr = to_a
         arr.length.times do |index|
-          hash[vars[index]] << arr[index].to_s
+          hash[vars[index]] = arr[index].to_s
         end
         hash.each_pair(&block)
       end
