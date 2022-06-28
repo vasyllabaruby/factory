@@ -30,11 +30,11 @@ class Factory
     Class.new do
       attr_accessor(*args)
 
-      define_method :initialize do |*attr|
-        raise ArgumentError if args.size < attr.size
+      def initialize(*attr)
+        raise ArgumentError if members.size < attr.size
 
         attr.length.times do |index|
-          instance_variable_set("@#{args[index]}", attr[index])
+          instance_variable_set("@#{members[index]}", attr[index])
         end
       end
 
